@@ -8,11 +8,12 @@ https://gist.github.com/martin-kokos/7fb98650c66bd8d93767da6627affffa
 from __future__ import print_function
 import sys
 from import_flights import import_flights
-from connection_paths import get_all_paths
+from connection_paths import get_all_paths, path_to_string
 
 if __name__ == "__main__":
     (flights, flight_connections) = import_flights(input=sys.stdin)
 
-    paths = get_all_paths(flight_connections=flight_connections)
+    paths = get_all_paths(flights=flights, flight_connections=flight_connections)
     for p in paths:
-        print(p)
+        # print(p)
+        print(path_to_string(flights=flights, path=p))

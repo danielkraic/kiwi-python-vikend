@@ -6,12 +6,22 @@ from itertools import count
 from datetime import datetime
 import calendar
 
-def to_timestamp(datetime_string):
+def string2timestamp(datetime_string):
     """convert datetime string to timestamp
     :param datetime_string datetime string
     :return imestamp value
     """
     return calendar.timegm(datetime.strptime(datetime_string, '%Y-%m-%dT%H:%M:%S').utctimetuple())
+
+def timestamp2string(timestamp):
+    """
+    convert timestamp value to string
+    :param timestamp timestamp ValueError
+    :return string value
+    """
+    return datetime.fromtimestamp(
+        int(timestamp)
+    ).strftime('%Y-%m-%d %H:%M:%S')
 
 class Flight(object):
     """
@@ -45,12 +55,12 @@ class Flight(object):
          bag_price_s) = string.split(',')
 
         try:
-            self.departure = to_timestamp(departure_s)
+            self.departure = string2timestamp(departure_s)
         except ValueError:
             return "Invalid departure date: {}".format(departure_s)
 
         try:
-            self.arrival = to_timestamp(arrival_s)
+            self.arrival = string2timestamp(arrival_s)
         except ValueError:
             return "Invalid arrival date: {}".format(arrival_s)
 
@@ -70,8 +80,8 @@ class Flight(object):
             fl=self.flight_number,
             src=self.source,
             dest=self.destination,
-            st=self.departure,
-            end=self.arrival)
+            st=timestamp2string(self.departure),
+            end=timestamp2string(self.arrival))
 
     def is_connecting_of(self, other_flight):
         """check if current flight may be connecting flight of other_flight
@@ -86,7 +96,10 @@ class Flight(object):
 
         diff = self.departure - other_flight.arrival
 
-        if diff > 4 * 60 * 60 or diff < 1 * 60 * 60:
+        if diff > (4 * 60 * 60):
+            return False
+
+        if diff < (1 * 60 * 60):
             return False
 
         return True
