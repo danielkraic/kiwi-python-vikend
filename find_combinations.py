@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 
+"""
+find combinations of flights
+https://gist.github.com/martin-kokos/7fb98650c66bd8d93767da6627affffa
+"""
+
 from __future__ import print_function
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 import calendar
 from itertools import count
-import networkx as nx
 
 class Flight(object):
     """flight info
