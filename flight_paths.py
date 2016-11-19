@@ -3,7 +3,7 @@ flight paths related functionality module
 """
 
 import json
-from flight import Flight, get_flight_diff
+from flight import Flight, get_timestamps_diff, timestamp2string
 
 class FlightPaths(object):
     """
@@ -72,23 +72,54 @@ class FlightPaths(object):
         """
         get human readable string of path
         """
-        output = ''
+        bags_allowed = min([f.bags_allowed for f in path])
+        full_price = []
+        for bags_count in range(bags_allowed+1):
+            full_price.append(dict(
+                bags_count=bags_count,
+                price=sum([f.get_full_price(bags_count) for f in path])))
+
+        output = 'Source: {source} {departure}, Destination {destination} {arrival}, Duration: {duration}. Bags allowed: {bags_allowed}. Price: {full_price}\n'.format(
+            source=path[0].source,
+            destination=path[-1].destination,
+            departure=timestamp2string(path[0].departure),
+            arrival=timestamp2string(path[-1].arrival),
+            duration=get_timestamps_diff(start=path[0].departure, end=path[-1].arrival),
+            full_price=full_price,
+            bags_allowed=bags_allowed)
 
         i = 0
         while i < len(path):
             if i != 0:
-                output += 'diff between flights: {}\n'.format(get_flight_diff(path[i-1], path[i]))
+                output += 'diff between flights: {}\n'.format(
+                    get_timestamps_diff(start=path[i-1].arrival, end=path[i].departure))
 
             output += "{}\n".format(path[i].to_string())
             i += 1
 
         return output
 
-    def _path_to_json(self, path):
+    def _path_to_json(self, path, ):
         """
         get json object from path
         """
-        return [f.to_json() for f in path]
+        bags_allowed = min([f.bags_allowed for f in path])
+        full_price = []
+        for bags_count in range(bags_allowed+1):
+            full_price.append(dict(
+                bags_count=bags_count,
+                price=sum([f.get_full_price(bags_count) for f in path])))
+
+        return dict(
+            source=path[0].source,
+            destination=path[-1].destination,
+            departure=path[0].departure,
+            arrival=path[-1].arrival,
+            duration=path[-1].arrival - path[0].departure,
+            full_price=full_price,
+            bags_allowed=bags_allowed,
+            flights=[f.to_json() for f in path]
+        )
 
     def to_string(self):
         """

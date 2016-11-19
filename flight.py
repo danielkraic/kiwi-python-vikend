@@ -24,11 +24,11 @@ def timestamp2string(timestamp):
     ).strftime('%Y-%m-%d %H:%M:%S')
 
 
-def get_flight_diff(flight1, flight2):
+def get_timestamps_diff(start, end):
     """
-    get humand readable diff between flights
+    get humand readable diff between two timestamps
     """
-    diff = flight2.departure - flight1.arrival
+    diff = end - start
     minutes, seconds = divmod(diff, 60)
     hours, minutes = divmod(minutes, 60)
     return "{hours}h {minutes}m {seconds}s".format(hours=hours, minutes=minutes, seconds=seconds)
