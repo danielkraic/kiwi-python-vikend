@@ -23,6 +23,16 @@ def timestamp2string(timestamp):
         int(timestamp)
     ).strftime('%Y-%m-%d %H:%M:%S')
 
+
+def get_flight_diff(flight1, flight2):
+    """
+    get humand readable diff between flights
+    """
+    diff = flight2.departure - flight1.arrival
+    minutes, seconds = divmod(diff, 60)
+    hours, minutes = divmod(minutes, 60)
+    return "{hours}h {minutes}m {seconds}s".format(hours=hours, minutes=minutes, seconds=seconds)
+
 class Flight(object):
     """
     flight info
@@ -75,13 +85,52 @@ class Flight(object):
         self.bags_allowed = int(bags_allowed_s)
         self.bag_price = int(bag_price_s)
 
-    def __str__(self):
+    def to_string(self):
+        """
+        get human readable string from flight
+        :return
+        """
         return '{fl}: {src} {st} ->  {dest} {end}'.format(
             fl=self.flight_number,
             src=self.source,
             dest=self.destination,
             st=timestamp2string(self.departure),
             end=timestamp2string(self.arrival))
+
+    def to_json(self):
+        """
+        get json object from flight
+        :return json object
+        """
+        return dict(
+            source=self.source,
+            destination=self.destination,
+            departure=self.departure,
+            arrival=self.arrival,
+            flight_number=self.flight_number,
+            price=self.price,
+            bags_allowed=self.bags_allowed,
+            bag_price=self.bag_price)
+
+    def get_full_price(self, bags_count):
+        """
+        get full price including baggage
+        """
+        if bags_count > self.bags_allowed:
+            raise ValueError("Invalid baggage count ({cnt}), max baggage allowed: {max}"
+                             .format(cnt=bags_count, max=self.bags_allowed))
+
+        return self.price + bags_count * self.bag_price
+
+    def get_bags_price(self, bags_count):
+        """
+        get price for baggage
+        """
+        if bags_count > self.bags_allowed:
+            raise ValueError("Invalid baggage count ({cnt}), max baggage allowed: {max}"
+                             .format(cnt=bags_count, max=self.bags_allowed))
+
+        return bags_count * self.bag_price
 
     def is_connecting_of(self, other_flight):
         """check if current flight may be connecting flight of other_flight

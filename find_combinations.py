@@ -6,14 +6,24 @@ https://gist.github.com/martin-kokos/7fb98650c66bd8d93767da6627affffa
 """
 
 from __future__ import print_function
+import argparse
 import sys
-from import_flights import import_flights
-from connection_paths import get_all_paths, path_to_string
+from flight_paths import FlightPaths
 
 if __name__ == "__main__":
-    (flights, flight_connections) = import_flights(input=sys.stdin)
+    parser = argparse.ArgumentParser(description="Find flights paths from flights data")
+    parser.add_argument('--json', action='store_true', help='prin output in json format')
 
-    paths = get_all_paths(flights=flights, flight_connections=flight_connections)
-    for p in paths:
-        # print(p)
-        print(path_to_string(flights=flights, path=p))
+    args = parser.parse_args()
+
+    fp = FlightPaths()
+    fp.import_flights(input_=sys.stdin)
+
+    # print("imported {} flights".format(len(fp.get_flights())))
+    # print("found {} connections".format(len(fp.get_flight_connections())))
+    # print("found {} paths".format(len(fp.get_paths())))
+
+    if args.json:
+        print(fp.to_json())
+    else:
+        print(fp.to_string())
