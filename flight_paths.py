@@ -51,26 +51,33 @@ class FlightPaths(object):
         self._explore_paths()
 
     def _explore_paths(self):
+        """
+        explore all paths between connected flights
+        """
         for src in self._flight_connections:
             path = [src]
             self._add_connections_to_paths(path=path)
 
     def _add_connections_to_paths(self, path):
+        """
+        add flight connection to path
+        :param path path to be checked
+        """
         src_flight = path[-1]
         if src_flight not in self._flight_connections:
             return
 
         paths = [path + [dest] for dest in self._flight_connections[src_flight]]
         for path in paths:
-            if len(path) > 0:
-                if path[0].source != path[-1].destination:
-                    self._paths.append(path)
-
+            if path[0].source != path[-1].destination:
+                self._paths.append(path)
                 self._add_connections_to_paths(path=path)
 
     def _path_to_string(self, path):
         """
         get human readable string of path
+        :param path path to converted to string
+        :return human readable string of path
         """
         bags_allowed = min([f.bags_allowed for f in path])
         full_price = ''
@@ -109,9 +116,11 @@ Number of flights: {flights_count}
 
         return output
 
-    def _path_to_json(self, path, ):
+    def _path_to_json(self, path):
         """
         get json object from path
+        :param path path to converted to json
+        :return json object from path
         """
         bags_allowed = min([f.bags_allowed for f in path])
         full_price = []
@@ -134,6 +143,7 @@ Number of flights: {flights_count}
     def to_string(self):
         """
         get human readable string of all paths
+        :return human readable string of all paths
         """
         if not self._paths:
             return 'No paths found. Number of imported flights: {}. Number of found flight connections: {}.'.format(
@@ -149,9 +159,23 @@ Number of flights: {flights_count}
     def to_json(self):
         """
         get json object from all paths
+        :return json object from all paths
         """
         output = []
         for path in self._paths:
             output.append(self._path_to_json(path=path))
 
         return json.dumps(output)
+
+    def get_summary(self):
+        """
+        get summary string of all paths with source and destination only
+        :return summary string of all paths with source and destination only
+        """
+        output = ''
+        for path in self._paths:
+            for flight in path:
+                output += '{} -> {}. '.format(flight.source, flight.destination)
+            output += '\n'
+
+        return output

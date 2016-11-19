@@ -53,7 +53,7 @@ class Flight(object):
     def parse_from_string(self, string):
         """parse Flight data from string
         :param lene line string data
-        :return error message
+        :return optional error message
         """
         if not string:
             return 'Unbale to import flight from empty string'
@@ -91,7 +91,7 @@ class Flight(object):
     def to_string(self):
         """
         get human readable string from flight
-        :return
+        :return human readable string from flight
         """
         return '{fl}: {src} {st} ->  {dest} {end}'.format(
             fl=self.flight_number,
@@ -118,6 +118,8 @@ class Flight(object):
     def get_full_price(self, bags_count):
         """
         get full price including baggage
+        :param bags_count number of bags
+        :return full price including baggage
         """
         if bags_count > self.bags_allowed:
             raise ValueError("Invalid baggage count ({cnt}), max baggage allowed: {max}"
@@ -128,6 +130,8 @@ class Flight(object):
     def get_bags_price(self, bags_count):
         """
         get price for baggage
+        :param bags_count number of bags
+        :return price for baggage
         """
         if bags_count > self.bags_allowed:
             raise ValueError("Invalid baggage count ({cnt}), max baggage allowed: {max}"
@@ -136,7 +140,8 @@ class Flight(object):
         return bags_count * self.bag_price
 
     def is_connecting_of(self, other_flight):
-        """check if current flight may be connecting flight of other_flight
+        """
+        check if current flight may be connecting flight of other_flight
         :param other_flight
         :return True if current flight may be connecting flight of other_flight
         """
