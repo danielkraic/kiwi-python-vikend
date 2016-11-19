@@ -21,7 +21,7 @@ def timestamp2string(timestamp):
     """
     return datetime.fromtimestamp(
         int(timestamp)
-    ).strftime('%Y-%m-%d %H:%M:%S')
+    ).strftime('%Y-%m-%d %H:%M')
 
 
 def get_timestamps_diff(start, end):
@@ -31,7 +31,7 @@ def get_timestamps_diff(start, end):
     diff = end - start
     minutes, seconds = divmod(diff, 60)
     hours, minutes = divmod(minutes, 60)
-    return "{hours}h {minutes}m {seconds}s".format(hours=hours, minutes=minutes, seconds=seconds)
+    return "{hours}h {minutes}m".format(hours=hours, minutes=minutes)
 
 class Flight(object):
     """
@@ -40,7 +40,7 @@ class Flight(object):
     _ids = count(0)
 
     def __init__(self):
-        self.flight_id = next(self._ids) # next(get_next_id())
+        self.flight_id = next(self._ids) # auto-incremented id
         self.source = None
         self.destination = None
         self.departure = None
@@ -55,6 +55,9 @@ class Flight(object):
         :param lene line string data
         :return error message
         """
+        if not string:
+            return 'Unbale to import flight from empty string'
+
         (self.source,
          self.destination,
          departure_s,

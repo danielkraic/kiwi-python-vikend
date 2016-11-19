@@ -73,28 +73,38 @@ class FlightPaths(object):
         get human readable string of path
         """
         bags_allowed = min([f.bags_allowed for f in path])
-        full_price = []
+        full_price = ''
         for bags_count in range(bags_allowed+1):
-            full_price.append(dict(
+            full_price += 'bags:{bags_count},price:{price}. '.format(
                 bags_count=bags_count,
-                price=sum([f.get_full_price(bags_count) for f in path])))
+                price=sum([f.get_full_price(bags_count) for f in path]))
 
-        output = 'Source: {source} {departure}, Destination {destination} {arrival}, Duration: {duration}. Bags allowed: {bags_allowed}. Price: {full_price}\n'.format(
-            source=path[0].source,
-            destination=path[-1].destination,
-            departure=timestamp2string(path[0].departure),
-            arrival=timestamp2string(path[-1].arrival),
-            duration=get_timestamps_diff(start=path[0].departure, end=path[-1].arrival),
-            full_price=full_price,
-            bags_allowed=bags_allowed)
+        output = '''
+Source: {source} {departure}
+Destination {destination} {arrival}
+Duration: {duration}
+Bags allowed: {bags_allowed}
+Price: {full_price}
+Number of flights: {flights_count}
+'''.format(
+
+    source=path[0].source,
+    destination=path[-1].destination,
+    departure=timestamp2string(path[0].departure),
+    arrival=timestamp2string(path[-1].arrival),
+    duration=get_timestamps_diff(start=path[0].departure, end=path[-1].arrival),
+    full_price=full_price,
+    bags_allowed=bags_allowed,
+    flights_count=len(path))
 
         i = 0
         while i < len(path):
             if i != 0:
-                output += 'diff between flights: {}\n'.format(
+                output += '  Delay between flights: {}\n'.format(
                     get_timestamps_diff(start=path[i-1].arrival, end=path[i].departure))
 
-            output += "{}\n".format(path[i].to_string())
+            output += "  Flight {flight_number}: {flight_info}\n".format(
+                flight_number=i+1, flight_info=path[i].to_string())
             i += 1
 
         return output
@@ -125,10 +135,14 @@ class FlightPaths(object):
         """
         get human readable string of all paths
         """
+        if not self._paths:
+            return 'No paths found. Number of imported flights: {}. Number of found flight connections: {}.'.format(
+                len(self._flights), len(self._flight_connections)
+            )
+
         output = ''
         for path in self._paths:
             output += self._path_to_string(path=path) + '\n'
-        output += '\n'
 
         return output
 
@@ -141,21 +155,3 @@ class FlightPaths(object):
             output.append(self._path_to_json(path=path))
 
         return json.dumps(output)
-
-    def get_paths(self):
-        """
-        get all paths
-        """
-        return self._paths
-
-    def get_flights(self):
-        """
-        get all flights
-        """
-        return self._flights
-
-    def get_flight_connections(self):
-        """
-        get all flight connections
-        """
-        return self._flight_connections

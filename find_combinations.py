@@ -19,10 +19,6 @@ if __name__ == "__main__":
     fp = FlightPaths()
     fp.import_flights(input_=sys.stdin)
 
-    # print("imported {} flights".format(len(fp.get_flights())))
-    # print("found {} connections".format(len(fp.get_flight_connections())))
-    # print("found {} paths".format(len(fp.get_paths())))
-
     if args.json:
         print(fp.to_json())
     else:
